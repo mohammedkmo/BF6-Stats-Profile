@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Battlefield 6 Stats Viewer
+
+A modern, minimalist player statistics viewer for Battlefield 6. View player stats by visiting their subdomain (e.g., `moeka9.bf6.me`).
+
+## Features
+
+- 🎮 **Subdomain Routing**: Access player stats via subdomain (e.g., `playername.bf6.me`)
+- 📊 **Comprehensive Stats**: Display overview, combat, and featured statistics
+- 🎨 **EA-Inspired Design**: Modern, minimalist UI with dark theme
+- ⚡ **Fast & Cached**: Server-side rendering with 5-minute cache
+- 🧩 **Component-Based**: Built with shadcn/ui components
+
+## Tech Stack
+
+- **Next.js 16** - React framework with App Router
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Styling
+- **shadcn/ui** - UI components
+- **EA Drop API** - Player statistics
 
 ## Getting Started
 
-First, run the development server:
+### Installation
+
+```bash
+npm install
+```
+
+### Development
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit `http://localhost:3000` to see the homepage.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Testing Subdomain Routing Locally
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+For local development, you can test subdomain routing in two ways:
 
-## Learn More
+1. **Using Query Parameter**: Visit `http://localhost:3000?player=moeka9`
+2. **Using Hosts File**: Add entries to your `/etc/hosts` file:
+   ```
+   127.0.0.1 moeka9.localhost
+   ```
+   Then visit `http://moeka9.localhost:3000`
 
-To learn more about Next.js, take a look at the following resources:
+### Production Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+For production, configure your DNS to point subdomains to your server:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `*.bf6.me` → Your server IP
+- `bf6.me` → Your server IP
 
-## Deploy on Vercel
+The middleware will automatically route subdomains to the player stats page.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+├── app/
+│   ├── api/player/[playertag]/  # API route for fetching stats
+│   ├── player/[playertag]/       # Player stats page
+│   ├── layout.tsx                # Root layout
+│   └── page.tsx                  # Homepage
+├── components/
+│   ├── ui/                       # shadcn/ui components
+│   ├── player-profile.tsx        # Main player profile component
+│   ├── stat-card.tsx             # Stat card component
+│   └── featured-stat-card.tsx    # Featured stat card component
+├── types/
+│   └── player-stats.ts           # TypeScript types for API response
+└── middleware.ts                 # Subdomain routing middleware
+```
+
+## API
+
+The app fetches player statistics from EA's Drop API:
+
+```
+GET https://drop-api.ea.com/player/{playertag}/stats?gameSlug=battlefield-6&eventName=BF6_S1B3_9a2cS6p05Z&locale=en&source=web_search
+```
+
+## Environment Variables
+
+No environment variables are required for basic functionality. The API is public.
+
+## License
+
+MIT
+# BF6-Stats-Profile
