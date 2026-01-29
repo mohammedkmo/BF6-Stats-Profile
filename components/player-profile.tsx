@@ -18,6 +18,7 @@ interface PlayerProfileProps {
   coverImageUrl?: string;
 }
 
+
 export function PlayerProfile({ stats, coverImageUrl }: PlayerProfileProps) {
   const t = useTranslation();
 
@@ -233,18 +234,21 @@ export function PlayerProfile({ stats, coverImageUrl }: PlayerProfileProps) {
 
         {/* Extended Stats */}
         {extendedStats && extendedStats.length > 0 && (
-          <div className="mb-12">
+          <div className="mb-12 p-4 min-h-52 ">
+            <h2 className="mb-6 text-md font-light text-center tracking-tight text-zinc-400">
+              - {t("section.additional")} -
+            </h2>
             {extendedStats.map((stat, index) => (
               <div
                 key={stat.id}
                 className="animate-in fade-in slide-in-from-bottom-4"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="p-4 min-h-52 flex flex-col items-center justify-center">
-                  <h1 className="text-2xl font-semibold tracking-tight text-white">
+                <div className="flex flex-col items-center justify-center">
+                  <h1 className="text-2xl font-semibold text-center tracking-tight text-white">
                     {stat.name}
                   </h1>
-                  <p className="text-6xl mt-2 font-bold text-red-500 font-mono">
+                  <p className={`text-8xl mt-4  text-center text-red-500 font-bold font-mono`}>
                     {stat.value}
                   </p>
 

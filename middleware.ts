@@ -19,6 +19,13 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
+  // Skip static files (images, fonts, etc.)
+  const staticFileExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp', '.css', '.js', '.woff', '.woff2', '.ttf', '.eot', '.json'];
+  const isStaticFile = staticFileExtensions.some(ext => url.pathname.toLowerCase().endsWith(ext));
+  if (isStaticFile) {
+    return response;
+  }
+
   // Remove port number if present (e.g., "bf6.me:3000" -> "bf6.me")
   const hostnameWithoutPort = hostname.split(':')[0];
   
@@ -74,8 +81,8 @@ export const config = {
      * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
+     * - Static files: images, fonts, icons, etc. (handled by explicit check in middleware)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon\\.ico).*)',
   ],
 };
