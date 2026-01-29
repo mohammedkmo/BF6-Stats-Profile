@@ -1,6 +1,5 @@
 import { PlayerProfile } from '@/components/player-profile';
 import { notFound } from 'next/navigation';
-import type { PlayerStatsResponse } from '@/types/player-stats';
 import { getServerLanguage } from '@/lib/server-language';
 import { fetchPlayerStatsWithFallback, buildCoverImageUrl } from '@/lib/platform-fallback';
 
