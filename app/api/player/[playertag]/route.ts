@@ -34,9 +34,9 @@ export async function GET(
     }
 
     // Include platform in response for reference
-    const response: PlayerStatsResponse & { platform?: string } = {
+    const response: PlayerStatsResponse & { platform?: string | null } = {
       ...result.data,
-      platform: result.platform,
+      platform: result.platform || null,
     };
 
     return NextResponse.json(response);

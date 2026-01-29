@@ -10,7 +10,7 @@ export const PLATFORMS: Platform[] = ['ea', 'ps3', 'xbox', 'epic'];
 
 export interface PlayerStatsResult {
   data: PlayerStatsResponse;
-  platform: Platform;
+  platform: Platform | null; // null means no platform parameter was used
 }
 
 /**
@@ -21,6 +21,29 @@ export async function fetchPlayerStatsWithFallback(
   playertag: string,
   locale: string
 ): Promise<PlayerStatsResult | null> {
+  // First, try without platform parameter (default behavior)
+  try {
+    const defaultApiUrl = `${EA_API_BASE}/player/${playertag}/stats?gameSlug=${GAME_SLUG}&eventName=${EVENT_NAME}&locale=${locale}&source=web_search`;
+    
+    const defaultResponse = await fetch(defaultApiUrl, {
+      headers: {
+        'Accept': 'application/json',
+      },
+      next: { revalidate: 300 },
+    });
+
+    if (defaultResponse.ok) {
+      const data: PlayerStatsResponse = await defaultResponse.json();
+      if (data && data.playerStatsSummary) {
+        // No platform parameter was used, return null
+        return { data, platform: null };
+      }
+    }
+  } catch (error) {
+    console.warn(`Error fetching without platform parameter:`, error);
+  }
+
+  // If default fails, try all platforms
   for (const platform of PLATFORMS) {
     try {
       const apiUrl = `${EA_API_BASE}/player/${playertag}/stats?gameSlug=${GAME_SLUG}&eventName=${EVENT_NAME}&locale=${locale}&platform=${platform}&source=web_search`;
@@ -63,11 +86,16 @@ export async function fetchPlayerStatsWithFallback(
 
 /**
  * Builds the cover image URL for a player on a specific platform
+ * If platform is null, builds URL without platform parameter
  */
 export function buildCoverImageUrl(
   playertag: string,
   locale: string,
-  platform: Platform
+  platform: Platform | null
 ): string {
+  if (platform === null) {
+    // No platform parameter - use default
+    return `${EA_API_BASE}/player/${playertag}/image?aspectRatio=16x9&gameSlug=${GAME_SLUG}&eventName=${EVENT_NAME}&locale=${locale}&source=web_search`;
+  }
   return `${EA_API_BASE}/player/${playertag}/image?aspectRatio=16x9&gameSlug=${GAME_SLUG}&eventName=${EVENT_NAME}&locale=${locale}&platform=${platform}&source=web_search`;
 }

@@ -19,11 +19,14 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
+  // Remove port number if present (e.g., "bf6.me:3000" -> "bf6.me")
+  const hostnameWithoutPort = hostname.split(':')[0];
+  
   // Extract hostname parts (e.g., ["moeka9", "bf6", "me"] or ["bf6", "me"])
-  const hostnameParts = hostname.split('.');
+  const hostnameParts = hostnameWithoutPort.split('.');
   
   // Check if we're on localhost (development)
-  const isLocalhost = hostname.includes('localhost') || hostname.includes('127.0.0.1');
+  const isLocalhost = hostnameWithoutPort.includes('localhost') || hostnameWithoutPort.includes('127.0.0.1');
   
   if (isLocalhost) {
     // For localhost, use query param approach: ?player=moeka9
@@ -48,7 +51,7 @@ export function middleware(request: NextRequest) {
     const subdomain = hostnameParts[0];
     
     // Skip common reserved subdomains
-    const reservedSubdomains = ['www', 'api', 'admin', 'mail', 'ftp', 'cpanel', 'webmail'];
+    const reservedSubdomains = ['www', 'api', 'admin', 'mail', 'ftp', 'cpanel', 'webmail', 'debug-host'];
     if (reservedSubdomains.includes(subdomain.toLowerCase())) {
       return response;
     }
@@ -61,8 +64,6 @@ export function middleware(request: NextRequest) {
   }
 
   // Root domain - let it continue to homepage
-  return response;
-
   return response;
 }
 
