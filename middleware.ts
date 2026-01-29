@@ -14,24 +14,19 @@ export function middleware(request: NextRequest) {
   // Set language in response header for API routes
   response.headers.set('x-locale', language);
 
-  // Extract subdomain (e.g., "moeka9" from "moeka9.bf6.me" or "moeka9.localhost:3000")
-  const parts = hostname.split('.');
-  const subdomain = parts[0];
-
-  // Skip if it's the root path or API routes
+  // Skip if it's API routes or Next.js internal routes
   if (url.pathname.startsWith('/api') || url.pathname.startsWith('/_next')) {
     return response;
   }
 
-  // For localhost development, check if hostname has a subdomain pattern
-  // e.g., "moeka9.localhost:3000" or just check the first part
+  // Extract hostname parts (e.g., ["moeka9", "bf6", "me"] or ["bf6", "me"])
+  const hostnameParts = hostname.split('.');
+  
+  // Check if we're on localhost (development)
   const isLocalhost = hostname.includes('localhost') || hostname.includes('127.0.0.1');
   
-  // If there's a subdomain and it's not "www" or common reserved names
-  // For localhost, we'll use a query param approach or check the first part
   if (isLocalhost) {
-    // For localhost, you can test with query param: ?player=moeka9
-    // Or configure your hosts file to use subdomain.localhost
+    // For localhost, use query param approach: ?player=moeka9
     const playerParam = url.searchParams.get('player');
     if (playerParam) {
       url.pathname = `/player/${playerParam}`;
@@ -40,13 +35,33 @@ export function middleware(request: NextRequest) {
       rewriteResponse.headers.set('x-locale', language);
       return rewriteResponse;
     }
-  } else if (subdomain && subdomain !== 'www' && parts.length > 1) {
-    // Production: rewrite subdomain to player page
+    // If no player param, let it continue to homepage
+    return response;
+  }
+
+  // Production: Check if we have a subdomain
+  // Root domain: bf6.me -> ["bf6", "me"] (length 2)
+  // Subdomain: moeka9.bf6.me -> ["moeka9", "bf6", "me"] (length 3+)
+  const hasSubdomain = hostnameParts.length >= 3;
+  
+  if (hasSubdomain) {
+    const subdomain = hostnameParts[0];
+    
+    // Skip common reserved subdomains
+    const reservedSubdomains = ['www', 'api', 'admin', 'mail', 'ftp', 'cpanel', 'webmail'];
+    if (reservedSubdomains.includes(subdomain.toLowerCase())) {
+      return response;
+    }
+    
+    // Rewrite subdomain to player page
     url.pathname = `/player/${subdomain}`;
     const rewriteResponse = NextResponse.rewrite(url);
     rewriteResponse.headers.set('x-locale', language);
     return rewriteResponse;
   }
+
+  // Root domain - let it continue to homepage
+  return response;
 
   return response;
 }
