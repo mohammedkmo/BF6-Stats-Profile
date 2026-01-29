@@ -254,6 +254,7 @@ export function PlayerProfile({ stats, coverImageUrl }: PlayerProfileProps) {
                     width={1000}
                     height={1000}
                     className="w-2xl h-full object-cover -mb-16"
+                    unoptimized
                   />
                 </div>
               </div>
